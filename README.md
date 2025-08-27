@@ -1,4 +1,38 @@
-# LLM Document Processing System - Complete Setup Guide
+# Semantic Document Processor
+
+## 📖 About
+
+**Semantic Document Processor** is an intelligent, open-source document analysis system that leverages Large Language Models (LLMs) to process and analyze complex documents like insurance policies, contracts, and legal documents. Built with modern AI/ML technologies, it provides structured, decision-ready responses to natural language queries against document collections.
+
+### 🎯 **What It Does**
+- **Smart Document Processing**: Automatically extracts, cleans, and chunks text from PDF, DOCX, EML, and TXT files
+- **Semantic Search**: Uses advanced embeddings (BGE model) to find relevant document sections based on meaning, not just keywords
+- **Intelligent Analysis**: Leverages local LLMs (via Ollama) to analyze queries and provide structured responses with decisions, justifications, and confidence scores
+- **Production Ready**: Includes a FastAPI REST API, comprehensive testing, and deployment configurations
+
+### 🚀 **Key Features**
+- **Multi-format Support**: Handles PDF, DOCX, EML, and TXT files seamlessly
+- **Local LLM Integration**: Uses Ollama for privacy-focused, offline document analysis
+- **Structured Output**: Returns JSON responses with decisions, amounts, justifications, and relevant clauses
+- **Scalable Architecture**: Modular design with separate phases for document processing, search indexing, and query analysis
+- **API-First Design**: RESTful API endpoints for easy integration into existing systems
+
+### 💼 **Use Cases**
+- **Insurance Claims Processing**: Analyze policy documents to determine coverage eligibility
+- **Contract Review**: Extract key terms and conditions from legal documents
+- **Compliance Checking**: Verify document requirements against regulatory standards
+- **Document Q&A**: Natural language interface for large document collections
+- **Research & Analysis**: Semantic search across academic or technical documents
+
+### 🛠 **Technology Stack**
+- **AI/ML**: Ollama (local LLMs), BGE embeddings, semantic search
+- **Backend**: Python, FastAPI, ChromaDB (vector database)
+- **Document Processing**: PyMuPDF, python-docx, email parsing
+- **Infrastructure**: Docker support, comprehensive logging, configuration management
+
+This project demonstrates how to build enterprise-grade document intelligence systems using open-source AI technologies, making advanced document analysis accessible to developers and organizations who prioritize privacy and cost-effectiveness.
+
+---
 
 ## 🚀 Project Overview
 
@@ -7,38 +41,34 @@ This is a complete, production-ready LLM Document Processing System that process
 ## 📁 Project Structure
 
 ```
-llm_document_processing/
+Semantic-Document-Processor/
 ├── README.md                      # This file
 ├── requirements.txt               # Python dependencies
 ├── config.yaml                    # Main configuration
-├── .env                          # Environment variables (create this)
-├── .gitignore                    # Git ignore file
+├── .gitignore                     # Git ignore file
 │
-├── data/                         # All data files
-│   ├── raw_documents/           # Place your PDF/DOCX/EML files here
-│   ├── processed/               # Generated processed files
-│   └── vector_db/               # ChromaDB storage
+├── data/                          # All data files
+│   ├── raw_documents/            # Place your PDF/DOCX/EML files here
+│   ├── processed/                # Generated processed files
+│   └── vector_db/                # ChromaDB storage
 │
-├── src/                         # Main source code
+├── src/                          # Main source code
 │   ├── phase1_document_processing.py
 │   ├── phase2_semantic_search.py
 │   ├── phase3_query_processing.py
-│   ├── phase4_llm_analysis.py
-│   └── main_pipeline.py         # Main orchestrator
+│   ├── phase4_ollama_llm.py
+│   └── main_pipeline_ollama.py  # Main orchestrator (Ollama-based)
 │
-├── notebooks/                   # Your existing notebooks
+├── notebooks/                    # Jupyter notebooks for development
 │   ├── Phase1.ipynb
 │   ├── Phase2.ipynb
 │   └── Phase3.ipynb
 │
-├── api/                         # FastAPI REST API
-│   ├── main.py
-│   ├── routes.py
-│   └── models.py
+├── api/                          # FastAPI REST API
+│   └── main.py
 │
-└── tests/                       # Test files
-    ├── test_integration.py
-    └── sample_queries.json
+└── tests/                        # Test files
+    └── __init__.py
 ```
 
 ## 🛠 Installation & Setup
@@ -46,9 +76,9 @@ llm_document_processing/
 ### Step 1: Environment Setup
 
 ```bash
-# Clone or create the project directory
-mkdir llm_document_processing
-cd llm_document_processing
+# Clone the repository
+git clone https://github.com/yourusername/Semantic-Document-Processor.git
+cd Semantic-Document-Processor
 
 # Create Python virtual environment
 python -m venv venv
@@ -70,12 +100,14 @@ pip install -r requirements.txt
    - `config.yaml`
    - All Python files in `src/` directory
 
-2. **Create `.env` file with your API keys:**
+2. **Install and start Ollama (for local LLM support):**
 ```bash
-# Copy the .env template and add your keys
-OPENAI_API_KEY=your_openai_api_key_here
-ENVIRONMENT=development
-DEBUG=True
+# Install Ollama from https://ollama.ai/
+# Then pull the required model:
+ollama pull llama3
+
+# Start Ollama service
+ollama serve
 ```
 
 3. **Create directory structure:**
@@ -107,7 +139,7 @@ data/raw_documents/
 
 ```bash
 # From project root directory
-python src/main_pipeline.py
+python src/main_pipeline_ollama.py
 ```
 
 This will:
@@ -115,6 +147,8 @@ This will:
 2. ✅ Generate embeddings and build search index  
 3. ✅ Run system tests
 4. ✅ Start interactive query mode
+
+**Note:** Make sure Ollama is running (`ollama serve`) and the `llama3` model is downloaded (`ollama pull llama3`) before running the pipeline.
 
 ### Option 2: Step-by-Step Execution
 
@@ -128,8 +162,8 @@ python src/phase2_semantic_search.py
 # Step 3: Test query processing
 python src/phase3_query_processing.py
 
-# Step 4: Test LLM analysis (requires OpenAI API key)
-python src/phase4_llm_analysis.py
+# Step 4: Test LLM analysis (requires Ollama running)
+python src/phase4_ollama_llm.py
 ```
 
 ### Option 3: Use Your Existing Notebooks
@@ -200,8 +234,8 @@ embeddings:
 
 # LLM settings
 llm:
-  provider: "openai"
-  model: "gpt-4-turbo-preview" 
+  provider: "ollama"
+  model: "llama3" 
   temperature: 0.1
   max_tokens: 2000
 
@@ -298,9 +332,10 @@ python src/phase4_llm_analysis.py
    - Ensure `config.yaml` is in the project root
    - Check file permissions
 
-2. **"OpenAI API key not set"**
-   - Add your API key to `.env` file
-   - Set environment variable: `export OPENAI_API_KEY=your_key`
+2. **"Ollama connection failed"**
+   - Make sure Ollama is running: `ollama serve`
+   - Check if the model is downloaded: `ollama list`
+   - Pull the required model: `ollama pull llama3`
 
 3. **"No documents found"**  
    - Place PDF/DOCX files in `data/raw_documents/`
@@ -380,13 +415,16 @@ CMD ["python", "src/main_pipeline.py"]
 
 ```bash
 # Build and run
-docker build -t llm-doc-processor .
-docker run -p 8000:8000 -e OPENAI_API_KEY=your_key llm-doc-processor
+docker build -t semantic-doc-processor .
+docker run -p 8000:8000 semantic-doc-processor
+
+# Note: For production, you may want to run Ollama separately
+# or use a multi-container setup with docker-compose
 ```
 
-## 📞 Support
 
-For issues or questions:
+
+##For issues or questions:
 
 1. Check the troubleshooting section above
 2. Review the logs in `logs/app.log`
